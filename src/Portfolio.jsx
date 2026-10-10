@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { ArrowRight, Mail, Layout, Code, PenTool, ExternalLink } from 'lucide-react';
 import { supabase } from './supabase';
@@ -64,6 +65,7 @@ const IDBadge = ({ profile }) => {
 };
 
 export default function Portfolio() {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [projects, setProjects] = useState([]);
   const carouselRef = useRef(null);
@@ -101,6 +103,7 @@ export default function Portfolio() {
 
       <main className="pt-32 pb-24 space-y-40">
         
+        {/* Hero Section */}
         <section className="flex flex-col items-center justify-center min-h-[70vh] px-6">
           <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="w-full relative">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none opacity-20">
@@ -112,6 +115,7 @@ export default function Portfolio() {
           </motion.div>
         </section>
 
+        {/* Roles & Tech Stack Section */}
         <motion.section 
           initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }}
           variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
@@ -143,10 +147,11 @@ export default function Portfolio() {
           </div>
         </motion.section>
 
+        {/* Projects Section */}
         <section className="space-y-8 px-6 md:px-12 max-w-7xl mx-auto overflow-hidden">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
             <h2 className="text-4xl md:text-5xl font-bold tracking-tighter mb-2">Selected work</h2>
-            <p className="text-zinc-400">Drag to explore web apps, UI/UX, and brand experiences.</p>
+            <p className="text-zinc-400">Drag to explore. Click any project for the full case study.</p>
           </motion.div>
 
           <motion.div ref={carouselRef} className="cursor-grab active:cursor-grabbing overflow-hidden pb-8">
@@ -158,11 +163,12 @@ export default function Portfolio() {
               {projects.map((project) => (
                 <motion.div 
                   key={project.id}
-                  className={`min-w-[85vw] md:min-w-[450px] h-[450px] rounded-3xl p-8 flex flex-col justify-between bg-gradient-to-br ${project.color_gradient} border border-white/10 relative overflow-hidden group`}
+                  onClick={() => navigate(`/project/${project.id}`)}
+                  className={`min-w-[85vw] md:min-w-[450px] h-[450px] rounded-3xl p-8 flex flex-col justify-between bg-gradient-to-br ${project.color_gradient} border border-white/10 relative overflow-hidden group cursor-pointer hover:border-white/30 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.1)] transition-all duration-300`}
                 >
                   <div className="z-10">
                     <p className="text-white/70 text-sm font-medium mb-2">{project.category}</p>
-                    <h3 className="text-3xl font-bold text-white">{project.title}</h3>
+                    <h3 className="text-3xl font-bold text-white group-hover:translate-x-2 transition-transform duration-300">{project.title}</h3>
                   </div>
                   <div className="z-10 flex justify-between items-end">
                     <div className="flex flex-wrap gap-2">
@@ -172,7 +178,7 @@ export default function Portfolio() {
                         </span>
                       ))}
                     </div>
-                    <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center md:translate-y-4 md:opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                    <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center md:translate-y-4 md:opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110">
                       <ExternalLink className="w-5 h-5"/>
                     </div>
                   </div>
@@ -182,6 +188,7 @@ export default function Portfolio() {
           </motion.div>
         </section>
 
+        {/* Footer/CTA Section */}
         <motion.section 
           initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}
           className="text-center space-y-10 py-20 border-t border-white/5 px-6"
