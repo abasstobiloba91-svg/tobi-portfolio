@@ -34,27 +34,42 @@ export default function AdminDashboard() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    await supabase.auth.signInWithPassword({ email: e.target.email.value, password: e.target.password.value });
+    const { error } = await supabase.auth.signInWithPassword({
+      email: e.target.email.value,
+      password: e.target.password.value
+    });
+    
+    if (error) {
+      alert("Login failed: " + error.message);
+    }
   };
 
   const saveProfile = async () => {
-    await supabase.from('profile').upsert({ id: 1, ...profile });
-    alert('Profile updated');
+    const { error } = await supabase.from('profile').upsert({ id: 1, ...profile });
+    if (error) alert("Error saving: " + error.message);
+    else alert('Profile updated successfully!');
   };
 
   const addProject = async (e) => {
     e.preventDefault();
     const techArray = newProject.tech_stack.split(',').map(t => t.trim());
     const { data, error } = await supabase.from('projects').insert([{ ...newProject, tech_stack: techArray }]).select();
-    if (!error && data) {
+    
+    if (error) {
+      alert("Error adding project: " + error.message);
+    } else if (data) {
       setProjects([data[0], ...projects]);
       setNewProject({ title: '', category: '', tech_stack: '', color_gradient: 'from-blue-900 to-indigo-900' });
     }
   };
 
   const deleteProject = async (id) => {
-    await supabase.from('projects').delete().eq('id', id);
-    setProjects(projects.filter(p => p.id !== id));
+    const { error } = await supabase.from('projects').delete().eq('id', id);
+    if (error) {
+      alert("Error deleting: " + error.message);
+    } else {
+      setProjects(projects.filter(p => p.id !== id));
+    }
   };
 
   if (loading) return <div className="min-h-screen bg-[#0F0F11] text-white flex items-center justify-center">Loading...</div>;
@@ -64,9 +79,9 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-[#0F0F11] text-white flex items-center justify-center p-6">
         <form onSubmit={handleLogin} className="bg-zinc-900 p-8 rounded-2xl w-full max-w-md space-y-6 border border-zinc-800">
           <h2 className="text-2xl font-bold">Admin Login</h2>
-          <input name="email" type="email" placeholder="Email" required className="w-full bg-black/50 border border-zinc-800 rounded-lg p-3" />
-          <input name="password" type="password" placeholder="Password" required className="w-full bg-black/50 border border-zinc-800 rounded-lg p-3" />
-          <button type="submit" className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-zinc-200">Sign In</button>
+          <input name="email" type="email" placeholder="Email" required className="w-full bg-black/50 border border-zinc-800 rounded-lg p-3 outline-none focus:border-purple-500" />
+          <input name="password" type="password" placeholder="Password" required className="w-full bg-black/50 border border-zinc-800 rounded-lg p-3 outline-none focus:border-purple-500" />
+          <button type="submit" className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-zinc-200 transition-colors">Sign In</button>
         </form>
       </div>
     );
@@ -77,7 +92,7 @@ export default function AdminDashboard() {
       <div className="max-w-4xl mx-auto space-y-12">
         <header className="flex justify-between items-center border-b border-white/10 pb-6">
           <h1 className="text-3xl font-bold">Dashboard</h1>
-          <button onClick={() => supabase.auth.signOut()} className="flex items-center gap-2 text-zinc-400 hover:text-white">
+          <button onClick={() => supabase.auth.signOut()} className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
             <LogOut className="w-4 h-4"/> Logout
           </button>
         </header>
@@ -92,10 +107,10 @@ export default function AdminDashboard() {
         <section className="space-y-6">
           <h2 className="text-xl font-bold border-b border-white/10 pb-2">Manage Projects</h2>
           <form onSubmit={addProject} className="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input type="text" placeholder="Project Title" required value={newProject.title} onChange={e => setNewProject({...newProject, title: e.target.value})} className="bg-black/50 border border-zinc-800 rounded-lg p-3 outline-none" />
-            <input type="text" placeholder="Category" required value={newProject.category} onChange={e => setNewProject({...newProject, category: e.target.value})} className="bg-black/50 border border-zinc-800 rounded-lg p-3 outline-none" />
-            <input type="text" placeholder="Tech Stack (comma separated)" required value={newProject.tech_stack} onChange={e => setNewProject({...newProject, tech_stack: e.target.value})} className="bg-black/50 border border-zinc-800 rounded-lg p-3 outline-none" />
-            <select value={newProject.color_gradient} onChange={e => setNewProject({...newProject, color_gradient: e.target.value})} className="bg-black/50 border border-zinc-800 rounded-lg p-3 outline-none text-white">
+            <input type="text" placeholder="Project Title" required value={newProject.title} onChange={e => setNewProject({...newProject, title: e.target.value})} className="bg-black/50 border border-zinc-800 rounded-lg p-3 outline-none focus:border-purple-500" />
+            <input type="text" placeholder="Category" required value={newProject.category} onChange={e => setNewProject({...newProject, category: e.target.value})} className="bg-black/50 border border-zinc-800 rounded-lg p-3 outline-none focus:border-purple-500" />
+            <input type="text" placeholder="Tech Stack (comma separated)" required value={newProject.tech_stack} onChange={e => setNewProject({...newProject, tech_stack: e.target.value})} className="bg-black/50 border border-zinc-800 rounded-lg p-3 outline-none focus:border-purple-500" />
+            <select value={newProject.color_gradient} onChange={e => setNewProject({...newProject, color_gradient: e.target.value})} className="bg-black/50 border border-zinc-800 rounded-lg p-3 outline-none text-white focus:border-purple-500">
               <option value="from-blue-900 to-indigo-900">Blue Gradient</option>
               <option value="from-red-900 to-orange-900">Red Gradient</option>
               <option value="from-green-900 to-emerald-900">Green Gradient</option>
