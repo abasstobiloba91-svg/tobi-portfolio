@@ -7,8 +7,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element="{<Portfolio" path="/"/>} />
-        <Route element="{<AdminDashboard" path="/admin"/>} />
+        <Route path="/" element={<Portfolio />} />
+        <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </BrowserRouter>
   );
