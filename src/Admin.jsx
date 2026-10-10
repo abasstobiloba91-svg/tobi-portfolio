@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './supabase';
-import { Trash2, Plus, Save, LogOut, UploadCloud } from 'lucide-react';
+import { Trash2, Plus, Save, LogOut, UploadCloud, Edit3 } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [profile, setProfile] = useState({ dp_url: '', about_me: '' });
+  const [editingId, setEditingId] = useState(null);
+  const [profile, setProfile] = useState({ dp_url: '', about_me: '', job_titles: '' });
   const [projects, setProjects] = useState([]);
-  const [newProject, setNewProject] = useState({ 
-    title: '', category: '', tech_stack: '', color_gradient: 'from-blue-900 to-indigo-900', 
-    project_url: '', description: '', testimonial: '', client_name: '', image_urls: [] 
-  });
+  
+  const emptyProject = { title: '', category: '', tech_stack: '', color_gradient: 'from-blue-900 to-indigo-900', project_url: '', description: '', testimonial: '', client_name: '', image_urls: [] };
+  const [newProject, setNewProject] = useState(emptyProject);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -58,8 +58,7 @@ export default function AdminDashboard() {
       const files = Array.from(e.target.files);
       const urls = [];
       for (const file of files) {
-        const url = await uploadFile(file, 'projects');
-        urls.push(url);
+        urls.push(await uploadFile(file, 'projects'));
       }
       setNewProject({ ...newProject, image_urls: [...newProject.image_urls, ...urls] });
     } catch (error) {
@@ -74,21 +73,38 @@ export default function AdminDashboard() {
     alert('Profile updated successfully!');
   };
 
-  const addProject = async (e) => {
+  const submitProject = async (e) => {
     e.preventDefault();
-    const techArray = newProject.tech_stack.split(',').map(t => t.trim());
-    const { data, error } = await supabase.from('projects').insert([{ ...newProject, tech_stack: techArray }]).select();
-    if (!error && data) {
-      setProjects([data[0], ...projects]);
-      setNewProject({ title: '', category: '', tech_stack: '', color_gradient: 'from-blue-900 to-indigo-900', project_url: '', description: '', testimonial: '', client_name: '', image_urls: [] });
+    const techArray = typeof newProject.tech_stack === 'string' ? newProject.tech_stack.split(',').map(t => t.trim()) : newProject.tech_stack;
+    
+    if (editingId) {
+      const { error } = await supabase.from('projects').update({ ...newProject, tech_stack: techArray }).eq('id', editingId);
+      if (!error) {
+        alert("Project updated!");
+        setEditingId(null);
+        setNewProject(emptyProject);
+        fetchData();
+      } else alert("Error updating: " + error.message);
     } else {
-      alert("Error adding project: " + error.message);
+      const { data, error } = await supabase.from('projects').insert([{ ...newProject, tech_stack: techArray }]).select();
+      if (!error && data) {
+        setProjects([data[0], ...projects]);
+        setNewProject(emptyProject);
+      } else alert("Error adding project: " + error.message);
     }
   };
 
+  const editProject = (project) => {
+    setNewProject({ ...project, tech_stack: project.tech_stack.join(', ') });
+    setEditingId(project.id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const deleteProject = async (id) => {
-    await supabase.from('projects').delete().eq('id', id);
-    setProjects(projects.filter(p => p.id !== id));
+    if(window.confirm("Are you sure you want to delete this project?")) {
+      await supabase.from('projects').delete().eq('id', id);
+      setProjects(projects.filter(p => p.id !== id));
+    }
   };
 
   if (!session) {
@@ -123,15 +139,19 @@ export default function AdminDashboard() {
               <input type="file" accept="image/*" onChange={handleProfileImage} className="hidden" disabled={uploading} />
             </label>
           </div>
-
-          <textarea rows="4" value={profile.about_me} onChange={e => setProfile({...profile, about_me: e.target.value})} placeholder="About Me Text" className="w-full bg-black/50 border border-zinc-800 rounded-lg p-3 outline-none focus:border-purple-500" />
+          
+          <input type="text" value={profile.job_titles || ''} onChange={e => setProfile({...profile, job_titles: e.target.value})} placeholder="ID Badge Subtitle (e.g. DESIGNER • DEVELOPER)" className="w-full bg-black/50 border border-zinc-800 rounded-lg p-3 outline-none focus:border-purple-500" />
+          <textarea rows="4" value={profile.about_me || ''} onChange={e => setProfile({...profile, about_me: e.target.value})} placeholder="About Me Text" className="w-full bg-black/50 border border-zinc-800 rounded-lg p-3 outline-none focus:border-purple-500" />
           <button onClick={saveProfile} className="bg-purple-600 hover:bg-purple-500 px-6 py-2 rounded-lg font-bold">Save Profile</button>
         </section>
 
-        {/* Add Project Section */}
+        {/* Add/Edit Project Section */}
         <section className="space-y-6">
-          <h2 className="text-xl font-bold border-b border-white/10 pb-2">Create New Project</h2>
-          <form onSubmit={addProject} className="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex justify-between items-center border-b border-white/10 pb-2">
+            <h2 className="text-xl font-bold">{editingId ? "Edit Project" : "Create New Project"}</h2>
+            {editingId && <button onClick={() => { setEditingId(null); setNewProject(emptyProject); }} className="text-sm text-zinc-400 hover:text-white">Cancel Edit</button>}
+          </div>
+          <form onSubmit={submitProject} className="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 grid grid-cols-1 md:grid-cols-2 gap-4">
             <input type="text" placeholder="Project Title" required value={newProject.title} onChange={e => setNewProject({...newProject, title: e.target.value})} className="bg-black/50 border border-zinc-800 rounded-lg p-3 outline-none" />
             <input type="text" placeholder="Category (e.g., Web App)" required value={newProject.category} onChange={e => setNewProject({...newProject, category: e.target.value})} className="bg-black/50 border border-zinc-800 rounded-lg p-3 outline-none" />
             <input type="text" placeholder="Tech Stack (comma separated)" required value={newProject.tech_stack} onChange={e => setNewProject({...newProject, tech_stack: e.target.value})} className="bg-black/50 border border-zinc-800 rounded-lg p-3 outline-none" />
@@ -148,7 +168,12 @@ export default function AdminDashboard() {
                 <input type="file" accept="image/*" multiple onChange={handleProjectImages} className="hidden" disabled={uploading} />
               </label>
               {newProject.image_urls.length > 0 && (
-                <p className="text-sm text-green-400">{newProject.image_urls.length} image(s) uploaded</p>
+                <div className="flex gap-2 mt-2 overflow-x-auto pb-2">
+                  {newProject.image_urls.map((url, i) => (
+                     <img key={i} src={url} className="w-16 h-16 object-cover rounded-lg border border-zinc-700" alt="Upload preview" />
+                  ))}
+                  <button type="button" onClick={() => setNewProject({...newProject, image_urls: []})} className="text-xs text-red-400 p-2">Clear Images</button>
+                </div>
               )}
             </div>
 
@@ -158,7 +183,9 @@ export default function AdminDashboard() {
               <option value="from-green-900 to-emerald-900">Green Gradient</option>
             </select>
             
-            <button type="submit" className="md:col-span-2 bg-white text-black font-bold py-3 rounded-lg flex justify-center items-center gap-2 hover:bg-zinc-200 transition"><Plus className="w-5 h-5"/> Publish Project</button>
+            <button type="submit" className={`md:col-span-2 font-bold py-3 rounded-lg flex justify-center items-center gap-2 transition ${editingId ? 'bg-purple-600 hover:bg-purple-500 text-white' : 'bg-white text-black hover:bg-zinc-200'}`}>
+              <Plus className="w-5 h-5"/> {editingId ? "Save Changes" : "Publish Project"}
+            </button>
           </form>
         </section>
 
@@ -171,7 +198,10 @@ export default function AdminDashboard() {
                 <h3 className="font-bold text-lg">{project.title}</h3>
                 <p className="text-sm text-zinc-400">{project.category}</p>
               </div>
-              <button onClick={() => deleteProject(project.id)} className="text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition"><Trash2 className="w-5 h-5"/></button>
+              <div className="flex gap-2">
+                <button onClick={() => editProject(project)} className="text-blue-400 hover:bg-blue-400/10 p-2 rounded-lg transition"><Edit3 className="w-5 h-5"/></button>
+                <button onClick={() => deleteProject(project.id)} className="text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition"><Trash2 className="w-5 h-5"/></button>
+              </div>
             </div>
           ))}
         </section>
