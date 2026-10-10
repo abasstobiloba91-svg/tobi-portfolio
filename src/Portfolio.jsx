@@ -164,21 +164,34 @@ export default function Portfolio() {
                 <motion.div 
                   key={project.id}
                   onClick={() => navigate(`/project/${project.id}`)}
-                  className={`min-w-[85vw] md:min-w-[450px] h-[450px] rounded-3xl p-8 flex flex-col justify-between bg-gradient-to-br ${project.color_gradient} border border-white/10 relative overflow-hidden group cursor-pointer hover:border-white/30 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.1)] transition-all duration-300`}
+                  className="min-w-[85vw] md:min-w-[450px] h-[450px] rounded-3xl p-8 flex flex-col justify-between relative overflow-hidden group cursor-pointer hover:border-white/30 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.1)] transition-all duration-300 border border-white/10"
                 >
-                  <div className="z-10">
+                  {/* Glassmorphism Background Image Logic */}
+                  {project.image_urls && project.image_urls.length > 0 ? (
+                    <>
+                      <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style={{ backgroundImage: `url(${project.image_urls[0]})` }} />
+                      <div className="absolute inset-0 bg-black/70 backdrop-blur-[4px] group-hover:bg-black/50 transition-colors duration-500" />
+                    </>
+                  ) : (
+                    <div className={`absolute inset-0 bg-gradient-to-br ${project.color_gradient}`} />
+                  )}
+
+                  {/* Top Text Content */}
+                  <div className="relative z-10">
                     <p className="text-white/70 text-sm font-medium mb-2">{project.category}</p>
                     <h3 className="text-3xl font-bold text-white group-hover:translate-x-2 transition-transform duration-300">{project.title}</h3>
                   </div>
-                  <div className="z-10 flex justify-between items-end">
-                    <div className="flex flex-wrap gap-2">
+
+                  {/* Bottom Pills & Link Icon (Fixed layout) */}
+                  <div className="relative z-10 flex justify-between items-end w-full gap-4">
+                    <div className="flex flex-wrap gap-2 flex-1">
                       {project.tech_stack.map(t => (
-                        <span key={t} className="px-3 py-1 bg-black/30 backdrop-blur-md rounded-full text-xs text-white/90">
+                        <span key={t} className="px-3 py-1 bg-black/40 backdrop-blur-md rounded-full text-xs text-white border border-white/10">
                           {t}
                         </span>
                       ))}
                     </div>
-                    <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center md:translate-y-4 md:opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110">
+                    <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center md:translate-y-4 md:opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 shrink-0 shadow-lg">
                       <ExternalLink className="w-5 h-5"/>
                     </div>
                   </div>
