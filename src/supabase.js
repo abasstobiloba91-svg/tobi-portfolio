@@ -1,15 +1,6 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Portfolio from './Portfolio';
-import AdminDashboard from './Admin';
+import { createClient } from '@supabase/supabase-js';
 
-export default function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route element="{<Portfolio" path="/"/>} />
-        <Route element="{<AdminDashboard" path="/admin"/>} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+export const supabase = createClient(supabaseUrl, supabaseKey);
