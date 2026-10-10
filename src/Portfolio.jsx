@@ -68,6 +68,7 @@ export default function Portfolio() {
   const [projects, setProjects] = useState([]);
   const carouselRef = useRef(null);
   const [width, setWidth] = useState(0);
+  const tools = ["React", "Framer", "Vercel", "Supabase", "UI/UX", "Strategy"];
 
   useEffect(() => {
     const loadData = async () => {
@@ -111,24 +112,36 @@ export default function Portfolio() {
           </motion.div>
         </section>
 
-        <section className="overflow-hidden whitespace-nowrap py-10 flex border-y border-white/5 bg-zinc-900/20">
-          <motion.div 
-            className="flex gap-16 items-center"
-            animate={{ x: ["0%", "-50%"] }}
-            transition={{ repeat: Infinity, ease: "linear", duration: 15 }}
-          >
-            {[1, 2].map((i) => (
-              <div key={i} className="flex gap-16 items-center pl-16">
-                <span className="text-6xl md:text-8xl font-black bg-outline">DESIGNER</span>
-                <Layout className="w-12 h-12 text-purple-500" />
-                <span className="text-6xl md:text-8xl font-black bg-outline">DEVELOPER</span>
-                <Code className="w-12 h-12 text-blue-500" />
-                <span className="text-6xl md:text-8xl font-black bg-outline">CREATOR</span>
-                <PenTool className="w-12 h-12 text-orange-500" />
+        <motion.section 
+          initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }}
+          variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+          className="space-y-12 px-6 md:px-12 max-w-7xl mx-auto"
+        >
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-12">
+            <motion.div variants={fadeInUp} className="flex flex-col gap-2">
+              <div className="flex items-center gap-4">
+                <Layout className="w-8 h-8 md:w-12 md:h-12 text-purple-500"/>
+                <span className="text-5xl md:text-7xl font-bold tracking-tighter text-white">Designer.</span>
               </div>
-            ))}
-          </motion.div>
-        </section>
+              <div className="flex items-center gap-4">
+                <Code className="w-8 h-8 md:w-12 md:h-12 text-blue-500"/>
+                <span className="text-5xl md:text-7xl font-bold tracking-tighter text-zinc-500">Developer.</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <PenTool className="w-8 h-8 md:w-12 md:h-12 text-orange-500"/>
+                <span className="text-5xl md:text-7xl font-bold tracking-tighter text-zinc-700">Creator.</span>
+              </div>
+            </motion.div>
+            
+            <motion.div variants={fadeInUp} className="flex flex-wrap gap-3 md:max-w-[400px]">
+              {tools.map(tool => (
+                <span key={tool} className="px-6 py-3 bg-zinc-900/80 border border-zinc-800 rounded-full text-sm font-medium hover:bg-zinc-800 transition-colors cursor-pointer">
+                  {tool}
+                </span>
+              ))}
+            </motion.div>
+          </div>
+        </motion.section>
 
         <section className="space-y-8 px-6 md:px-12 max-w-7xl mx-auto overflow-hidden">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
@@ -136,11 +149,11 @@ export default function Portfolio() {
             <p className="text-zinc-400">Drag to explore web apps, UI/UX, and brand experiences.</p>
           </motion.div>
 
-          <motion.div ref={carouselRef} className="cursor-grab active:cursor-grabbing overflow-hidden">
+          <motion.div ref={carouselRef} className="cursor-grab active:cursor-grabbing overflow-hidden pb-8">
             <motion.div 
               drag="x"
               dragConstraints={{ right: 0, left: -width }}
-              className="flex gap-6 pb-8"
+              className="flex gap-6"
             >
               {projects.map((project) => (
                 <motion.div 
@@ -159,7 +172,7 @@ export default function Portfolio() {
                         </span>
                       ))}
                     </div>
-                    <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center transition-transform hover:scale-110">
+                    <div className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center md:translate-y-4 md:opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                       <ExternalLink className="w-5 h-5"/>
                     </div>
                   </div>
