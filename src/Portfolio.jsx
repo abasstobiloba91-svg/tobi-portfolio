@@ -91,9 +91,10 @@ export default function Portfolio() {
                 DESIGN BUILD
               </h1>
             </div>
-            <IDBadge profile="{profile}"/>
+            <IDBadge profile={profile} />
           </motion.div>
         </section>
+
         <motion.section 
           initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }}
           variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
