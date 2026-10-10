@@ -51,12 +51,7 @@ const IDBadge = ({ profile }) => {
            <div className="text-center w-full mt-8 space-y-2">
              <h2 className="text-2xl font-bold tracking-tight text-white uppercase">Tobiloba Abass</h2>
              <div className="h-px w-full bg-zinc-800 my-4" />
-             <a href="mailto:abasstobiloba91@gmail.com" className="w-full md:w-auto px-8 py-4 bg-white text-black rounded-full font-bold text-lg flex items-center justify-center gap-2 hover:scale-105 transition-transform">
-  Contact me <ArrowRight className="w-5 h-5"/>
-</a>
-<motion.button onClick={() => navigate('/quote')} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full md:w-auto px-8 py-4 bg-transparent border border-zinc-700 text-white rounded-full font-bold text-lg flex items-center justify-center gap-2">
-  Get a quote <Mail className="w-5 h-5"/>
-</motion.button>
+             <p className="text-sm text-zinc-400 font-mono tracking-widest">{profile?.job_titles || "DESIGNER • DEVELOPER"}</p>
            </div>
         </div>
 
@@ -103,7 +98,7 @@ export default function Portfolio() {
     <div className="min-h-screen font-sans selection:bg-purple-500/30 overflow-hidden">
       <nav className="fixed top-0 w-full p-6 flex justify-between items-center backdrop-blur-md z-50 border-b border-white/5">
         <span className="text-xl font-bold tracking-tighter">tobi.</span>
-        <button className="text-sm font-medium hover:text-purple-400 transition-colors">Contact</button>
+        <a href="mailto:abasstobiloba91@gmail.com" className="text-sm font-medium hover:text-purple-400 transition-colors">Contact</a>
       </nav>
 
       <main className="pt-32 pb-24 space-y-40">
@@ -215,10 +210,10 @@ export default function Portfolio() {
             Got an idea?<br/>Let's build it.
           </h2>
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 w-full">
-            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full md:w-auto px-8 py-4 bg-white text-black rounded-full font-bold text-lg flex items-center justify-center gap-2">
+            <a href="mailto:abasstobiloba91@gmail.com" className="w-full md:w-auto px-8 py-4 bg-white text-black rounded-full font-bold text-lg flex items-center justify-center gap-2 hover:scale-105 transition-transform">
               Contact me <ArrowRight className="w-5 h-5"/>
-            </motion.button>
-            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full md:w-auto px-8 py-4 bg-transparent border border-zinc-700 text-white rounded-full font-bold text-lg flex items-center justify-center gap-2">
+            </a>
+            <motion.button onClick={() => navigate('/quote')} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full md:w-auto px-8 py-4 bg-transparent border border-zinc-700 text-white rounded-full font-bold text-lg flex items-center justify-center gap-2">
               Get a quote <Mail className="w-5 h-5"/>
             </motion.button>
           </div>
