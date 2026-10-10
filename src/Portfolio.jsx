@@ -51,7 +51,12 @@ const IDBadge = ({ profile }) => {
            <div className="text-center w-full mt-8 space-y-2">
              <h2 className="text-2xl font-bold tracking-tight text-white uppercase">Tobiloba Abass</h2>
              <div className="h-px w-full bg-zinc-800 my-4" />
-             <p className="text-sm text-zinc-400 font-mono tracking-widest">DESIGNER • DEVELOPER</p>
+             <a href="mailto:abasstobiloba91@gmail.com" className="w-full md:w-auto px-8 py-4 bg-white text-black rounded-full font-bold text-lg flex items-center justify-center gap-2 hover:scale-105 transition-transform">
+  Contact me <ArrowRight className="w-5 h-5"/>
+</a>
+<motion.button onClick={() => navigate('/quote')} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full md:w-auto px-8 py-4 bg-transparent border border-zinc-700 text-white rounded-full font-bold text-lg flex items-center justify-center gap-2">
+  Get a quote <Mail className="w-5 h-5"/>
+</motion.button>
            </div>
         </div>
 
